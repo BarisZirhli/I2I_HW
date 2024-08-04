@@ -1,0 +1,90 @@
+--HW3
+
+--Q1
+
+SELECT 
+    DEPARTMENT_ID,
+    LISTAGG(FIRST_NAME || ' ' || LAST_NAME, ' ') WITHIN GROUP (ORDER BY EMPLOYEE_ID) AS EMPLOYEE
+FROM 
+    hr.Employees
+WHERE 
+    DEPARTMENT_ID IS NOT NULL
+GROUP BY 
+    DEPARTMENT_ID;
+
+
+
+--Q2
+
+SELECT  
+    employee_id, 
+    first_name, 
+    last_name, 
+    hire_date, 
+    salary, 
+    LAG(salary, 1, NULL) OVER (ORDER BY hire_date) AS salary_before, 
+    LEAD(salary, 1, NULL) OVER (ORDER BY hire_date) AS salary_after 
+FROM  
+    hr.Employees 
+ORDER BY  
+    hire_date;
+
+
+--Q3
+WITH RANKEDSALARIES AS (
+    SELECT
+        EMPLOYEE_ID,
+        FIRST_NAME,
+        LAST_NAME,
+        DEPARTMENT_ID,
+        SALARY,
+        ROW_NUMBER() OVER (PARTITION BY DEPARTMENT_ID ORDER BY SALARY DESC) AS SALARY_RANK
+    FROM
+        HR.EMPLOYEES
+)
+SELECT
+    SALARY_RANK,
+    EMPLOYEE_ID,
+    FIRST_NAME,
+    LAST_NAME,
+    DEPARTMENT_ID,
+    SALARY
+FROM
+    RANKEDSALARIES
+WHERE
+    SALARY_RANK > 1
+ORDER BY
+    DEPARTMENT_ID,
+    SALARY_RANK;
+
+
+--Q4
+SELECT
+    EMPLOYEE_ID,
+    FIRST_NAME,
+    LAST_NAME,
+    EXTRACT(YEAR FROM HIRE_DATE)  AS YEAR
+FROM
+    hr.Employees
+ORDER BY
+    HIRE_DATE;
+
+
+--Q5
+SELECT 
+    FIRST_NAME,
+    LAST_NAME,
+    SALARY,
+    LAG(SALARY, 1, NULL) OVER (ORDER BY HIRE_DATE) AS "BEFORE SALARY",
+    LEAD(SALARY, 1, NULL) OVER (ORDER BY HIRE_DATE) AS "AFTER SALARY"
+FROM 
+    hr.Employees
+ORDER BY 
+    HIRE_DATE;
+
+
+
+
+
+
+
